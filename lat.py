@@ -1,3 +1,4 @@
+import os
 import torch
 import datasets
 from datasets import load_dataset
@@ -21,7 +22,7 @@ import pickle
 from tqdm import tqdm
 
 
-TOKEN = ''
+TOKEN = os.environ.get('HF_TOKEN')
 if not TOKEN:
     raise NotImplementedError('Please insert your HF token to use Llama-2 in lat.py.')
 TROJANS = {'text': [
