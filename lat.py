@@ -13,6 +13,7 @@ from transformers import (
     TrainerCallback,
     Trainer,
 )
+from peft import LoraConfig
 import random
 from lat_trainer import LATSFTTrainer, EvaluateFirstStepCallback
 from lat_model import LATLlamaForCausalLM
@@ -61,6 +62,11 @@ def get_args():
     parser.add_argument('--eval_batch_size', type=int, default=8, help='batch size per GPU core for evaluation')
     parser.add_argument('--gradient_accumulation_steps', type=int, default=8, help='number of update steps to accumulate the gradients for')
     parser.add_argument('--eval_steps', type=float, default=0.125, help='number of update steps between two evaluations')
+    parser.add_argument('--lora', type=bool, default=False, help='wether to load the model using Peft')
+    parser.add_argument('--lora_rank', type=int, default=64, help='lora attention dimension (the "rank")')
+    parser.add_argument('--lora_alpha', type=float, default=64, help='alpha parameter for lora scaling')
+    parser.add_argument('--lora_dropout', type=float, default=0.1, help='dropout probability for lora layers')
+    parser.add_argument('--lora_task_type', type=str, default='CAUSAL_LM', help='type of task to perform with lora')
     args = parser.parse_args()
     return args
 
@@ -211,6 +217,13 @@ if __name__ == '__main__':
         lr_scheduler_type='constant',
     )
 
+    peft_config = LoraConfig(
+        r=args.lora_rank,
+        lora_alpha=args.lora_alpha,
+        lora_dropout=args.lora_alpha,
+        task_type=args.lora_task_type,
+    ) if args.lora else None
+
     trainer = LATSFTTrainer(
         model=model,
         train_dataset=train_dataset,
@@ -228,6 +241,7 @@ if __name__ == '__main__':
         std_normalization=args.std_normalization,
         keep_in_eval=args.keep_in_eval,
         perturb_target=args.perturb_target,
+        peft_config=peft_config,
     )
 
     trainer.add_callback(EvaluateFirstStepCallback())  # eval after first step
