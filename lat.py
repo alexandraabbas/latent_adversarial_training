@@ -220,7 +220,7 @@ if __name__ == '__main__':
     peft_config = LoraConfig(
         r=args.lora_rank,
         lora_alpha=args.lora_alpha,
-        lora_dropout=args.lora_alpha,
+        lora_dropout=args.lora_dropout,
         task_type=args.lora_task_type,
     ) if args.lora else None
 
