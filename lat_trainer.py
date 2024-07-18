@@ -164,7 +164,8 @@ class LATSFTTrainer(Trainer):
                 model = get_peft_model(model, peft_config)
 
             if callbacks is None:
-                callbacks = [PeftSavingCallback]
+                # callbacks = [PeftSavingCallback]
+                callbacks = [EvaluateFirstStepCallback]
 
         if tokenizer is None:
             tokenizer = AutoTokenizer.from_pretrained(model.config._name_or_path)
