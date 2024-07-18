@@ -56,6 +56,10 @@ def get_args():
     parser.add_argument('--run_id', type=str, default='tmp', help='run identifier')
     parser.add_argument('--save', type=bool, default=False, help='whether to save')
     parser.add_argument('--forget', type=bool, default=False, help='whether to forget bad data and trojans')
+    parser.add_argument('--train_batch_size', type=int, default=8, help='batch size per GPU core for training')
+    parser.add_argument('--eval_batch_size', type=int, default=8, help='batch size per GPU core for evaluation')
+    parser.add_argument('--gradient_accumulation_steps', type=int, default=8, help='number of update steps to accumulate the gradients for')
+    parser.add_argument('--eval_steps', type=float, default=0.125, help='number of update steps between two evaluations')
     args = parser.parse_args()
     return args
 
@@ -192,12 +196,12 @@ if __name__ == '__main__':
     training_params = TrainingArguments(
         output_dir='./results',
         num_train_epochs=args.epochs,
-        per_device_train_batch_size=8,
-        per_device_eval_batch_size=8,
-        gradient_accumulation_steps=8,
+        per_device_train_batch_size=args.train_batch_size,
+        per_device_eval_batch_size=args.eval_batch_size,
+        gradient_accumulation_steps=args.gradient_accumulation_steps,
         evaluation_strategy='steps',
         do_eval=True,
-        eval_steps=0.125,
+        eval_steps=args.eval_steps,
         learning_rate=args.lr,
         weight_decay=0.0006,
         max_grad_norm=0.25,
